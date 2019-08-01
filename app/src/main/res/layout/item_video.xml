@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+    >
+
+    <TextView
+        android:id="@+id/videoName"
+        android:layout_width="700dp"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="24sp"
+        />
+    <TextView
+        android:id="@+id/videoId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="24sp"
+        android:visibility="gone"
+        />
+    <TextView
+        android:id="@+id/videoType"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="24sp"
+        />
+    <TextView
+        android:id="@+id/videoDuration"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="24sp"
+        />
+    <TextView
+        android:id="@+id/videoResolution"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="24sp"
+        />
+
+
+</LinearLayout>

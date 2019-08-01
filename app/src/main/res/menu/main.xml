@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_video"
+          android:title="Videos"
+          android:orderInCategory="105"
+          android:showAsAction="ifRoom|withText"/>
+</menu>
