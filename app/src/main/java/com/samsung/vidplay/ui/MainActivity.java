@@ -100,7 +100,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
      */
     public static int FIRST_PAGE = 0;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
