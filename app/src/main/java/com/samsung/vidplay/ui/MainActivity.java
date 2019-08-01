@@ -95,12 +95,12 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     public final static int LOOPS = 1000;
     public CarouselPagerAdapter adapter;
     public ViewPager pager;
-    public static int count = 10; //ViewPager items size
+    public static int count = 5; //ViewPager items size
     /**
      * You shouldn't define first page = 0.
      * Let define firstpage = 'number viewpager size' to make endless carousel
      */
-    public static int FIRST_PAGE = 10;
+    public static int FIRST_PAGE = 0;
 
 
     @Override
@@ -212,10 +212,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 });
             }
 
-            if (vidFound) {
+            /*if (vidFound) {
                 initializeVideoPlayer();
-            }
-            //showImage(true, imageName, false, 0);
+            }*/
         }
     }
 

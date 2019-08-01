@@ -69,8 +69,13 @@ public class ItemFragment extends Fragment {
         TextView textView = linearLayout.findViewById(R.id.text);
         CarouselLinearLayout root = linearLayout.findViewById(R.id.root_container);
         imageView = linearLayout.findViewById(R.id.pagerImg);
+        getImagesFromSDCARD();
         textView.setText("Music: " + postion);
         imageView.setLayoutParams(layoutParams);
+        for (int i = 0; i < files.size(); i++) {
+            Drawable drawable = Drawable.createFromPath(files.get(i));
+            imageView.setImageDrawable(drawable);
+        }
         root.setScaleBoth(scale);
         return linearLayout;
     }
@@ -105,12 +110,12 @@ public class ItemFragment extends Fragment {
         screenWidth = displaymetrics.widthPixels;
     }
 
-    public void getFromSdcard() {
-        File file = new File(Environment.getExternalStorageDirectory(), "TMyFolder");
+    private void getImagesFromSDCARD() {
+        File file = new File(Environment.getExternalStorageDirectory(), "CuraContents/images");
         if (file.isDirectory()) {
             listFile = file.listFiles();
-            for (int i = 0; i < listFile.length; i++) {
-                files.add(listFile[i].getAbsolutePath());
+            for (File file1 : listFile) {
+                files.add(file1.getAbsolutePath());
             }
         }
     }
