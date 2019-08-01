@@ -3,6 +3,7 @@ package com.samsung.vidplay.ui;
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -22,6 +23,8 @@ import com.samsung.vidplay.utils.CarouselLinearLayout;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class ItemFragment extends Fragment {
@@ -34,11 +37,13 @@ public class ItemFragment extends Fragment {
     private int screenHeight;
     private ImageView imageView;
 
+    private ArrayList<String> files = new ArrayList<>();
+    private File[] listFile;
+
     public static Fragment newInstance(MainActivity context, int pos, float scale) {
         Bundle b = new Bundle();
         b.putInt(POSITON, pos);
         b.putFloat(SCALE, scale);
-
         return Fragment.instantiate(context, ItemFragment.class.getName(), b);
     }
 
@@ -98,5 +103,15 @@ public class ItemFragment extends Fragment {
         Objects.requireNonNull(getActivity()).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         screenHeight = displaymetrics.heightPixels;
         screenWidth = displaymetrics.widthPixels;
+    }
+
+    public void getFromSdcard() {
+        File file = new File(Environment.getExternalStorageDirectory(), "TMyFolder");
+        if (file.isDirectory()) {
+            listFile = file.listFiles();
+            for (int i = 0; i < listFile.length; i++) {
+                files.add(listFile[i].getAbsolutePath());
+            }
+        }
     }
 }
