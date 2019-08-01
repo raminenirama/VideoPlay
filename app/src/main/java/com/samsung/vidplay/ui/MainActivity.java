@@ -92,7 +92,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private int volume = 50;   // 0-100
     private int durationSecs;
     private ViewPager albumsPager;
-    public final static int LOOPS = 1000;
     public CarouselPagerAdapter adapter;
     public ViewPager pager;
     public static int count = 5; //ViewPager items size

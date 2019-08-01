@@ -46,9 +46,8 @@ public class CarouselPagerAdapter extends FragmentPagerAdapter implements ViewPa
     public int getCount() {
         int count = 0;
         try {
-            count = MainActivity.count * MainActivity.LOOPS;
+            count = MainActivity.count;
         } catch (Exception e) {
-            // TODO: handle exception
             e.printStackTrace();
         }
         return count;
