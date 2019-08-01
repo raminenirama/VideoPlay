@@ -33,7 +33,6 @@ public class ItemFragment extends Fragment {
 
     private static final String POSITON = "position";
     private static final String SCALE = "scale";
-    private static final String DRAWABLE_RESOURE = "resource";
 
     private int screenWidth;
     private int screenHeight;

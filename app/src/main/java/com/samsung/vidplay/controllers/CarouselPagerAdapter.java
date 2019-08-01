@@ -13,7 +13,7 @@ import com.samsung.vidplay.utils.CarouselLinearLayout;
 public class CarouselPagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
 
     public final static float BIG_SCALE = 1.0f;
-    public final static float SMALL_SCALE = 0.7f;
+    public final static float SMALL_SCALE = 0.6f;
     public final static float DIFF_SCALE = BIG_SCALE - SMALL_SCALE;
     private MainActivity context;
     private FragmentManager fragmentManager;
@@ -85,6 +85,6 @@ public class CarouselPagerAdapter extends FragmentPagerAdapter implements ViewPa
     }
 
     private String getFragmentTag(int position) {
-        return "android:switcher:" + context.pager.getId() + ":" + position;
+        return "android:switcher:" + context.albumsPager.getId() + ":" + position;
     }
 }

@@ -91,10 +91,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private PowerManager.WakeLock wakeLock;
     private int volume = 50;   // 0-100
     private int durationSecs;
-    private ViewPager albumsPager;
+    public ViewPager albumsPager;
     public CarouselPagerAdapter adapter;
-    public ViewPager pager;
-    public static int count = 5; //ViewPager items size
+    public static int count = 5;
     /**
      * You shouldn't define first page = 0.
      * Let define firstpage = 'number viewpager size' to make endless carousel
