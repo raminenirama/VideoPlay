@@ -1,6 +1,8 @@
 package com.samsung.vidplay.ui;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,7 +40,6 @@ public class ItemFragment extends Fragment {
     private ImageView imageView;
 
     private ArrayList<String> files = new ArrayList<>();
-    private File[] listFile;
 
     public static Fragment newInstance(MainActivity context, int pos, float scale) {
         Bundle b = new Bundle();
@@ -60,7 +61,7 @@ public class ItemFragment extends Fragment {
             return null;
         }
 
-        final int postion = Objects.requireNonNull(this.getArguments()).getInt(POSITON);
+        final int position = Objects.requireNonNull(this.getArguments()).getInt(POSITON);
         float scale = this.getArguments().getFloat(SCALE);
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(screenWidth / 2, screenHeight / 2);
@@ -70,12 +71,10 @@ public class ItemFragment extends Fragment {
         CarouselLinearLayout root = linearLayout.findViewById(R.id.root_container);
         imageView = linearLayout.findViewById(R.id.pagerImg);
         getImagesFromSDCARD();
-        textView.setText("Music: " + postion);
+        textView.setText("Music: " + position);
         imageView.setLayoutParams(layoutParams);
-        for (int i = 0; i < files.size(); i++) {
-            Drawable drawable = Drawable.createFromPath(files.get(i));
-            imageView.setImageDrawable(drawable);
-        }
+        Drawable drawable = Drawable.createFromPath(files.get(position));
+        imageView.setImageDrawable(drawable);
         root.setScaleBoth(scale);
         return linearLayout;
     }
@@ -113,7 +112,7 @@ public class ItemFragment extends Fragment {
     private void getImagesFromSDCARD() {
         File file = new File(Environment.getExternalStorageDirectory(), "CuraContents/images");
         if (file.isDirectory()) {
-            listFile = file.listFiles();
+            File[] listFile = file.listFiles();
             for (File file1 : listFile) {
                 files.add(file1.getAbsolutePath());
             }
