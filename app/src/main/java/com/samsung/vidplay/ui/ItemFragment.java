@@ -18,7 +18,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.samsung.vidplay.R;
+import com.samsung.vidplay.interfaces.GetImagePositionCallback;
 import com.samsung.vidplay.utils.CarouselLinearLayout;
+import com.samsung.vidplay.utils.VideoAppSingleton;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -35,6 +37,7 @@ public class ItemFragment extends Fragment {
     private int screenWidth;
     private int screenHeight;
     private ImageView imageView;
+    private GetImagePositionCallback getImagePositionCallback;
 
     private ArrayList<String> imageFilesPathList = new ArrayList<>();
 
@@ -70,10 +73,18 @@ public class ItemFragment extends Fragment {
         getImagesFromSDCARD();
         textView.setText("Music: " + position);
         imageView.setLayoutParams(layoutParams);
+        VideoAppSingleton.INSTANCE.setTotalCountOfImage(imageFilesPathList.size());
         Drawable drawable = Drawable.createFromPath(imageFilesPathList.get(position));
         imageView.setImageDrawable(drawable);
         root.setScaleBoth(scale);
         return linearLayout;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (getActivity() instanceof GetImagePositionCallback)
+            getImagePositionCallback = (GetImagePositionCallback) getActivity();
     }
 
     @Override
@@ -94,7 +105,8 @@ public class ItemFragment extends Fragment {
             for (String imagePathFromList : imageFilesPathList) {
                 if (imagePathFromList.equalsIgnoreCase(imageFilePath)) {
                     int positionOfImage = imageFilesPathList.indexOf(imageFilePath);
-                    EventBus.getDefault().postSticky(positionOfImage);
+                    if(getImagePositionCallback != null)
+                        getImagePositionCallback.getImagePosition(positionOfImage);
                 }
             }
         }

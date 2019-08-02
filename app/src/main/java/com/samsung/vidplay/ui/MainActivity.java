@@ -36,6 +36,8 @@ import com.samsung.smesh.util.FileUtils;
 import com.samsung.vidplay.R;
 import com.samsung.vidplay.VidPlayApp;
 import com.samsung.vidplay.controllers.CarouselPagerAdapter;
+import com.samsung.vidplay.interfaces.GetImagePositionCallback;
+import com.samsung.vidplay.utils.VideoAppSingleton;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -48,7 +50,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class MainActivity extends BaseActivity implements SurfaceHolder.Callback {
+public class MainActivity extends BaseActivity implements SurfaceHolder.Callback, GetImagePositionCallback {
     private static final String LOGTAG = "VidPlay.MainAct";
 
     private enum State {
@@ -94,7 +96,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private int durationSecs;
     public ViewPager albumsPager;
     public CarouselPagerAdapter adapter;
-    public static int count = 5;
+    public static int count = VideoAppSingleton.INSTANCE.getTotalCountOfImage();
     /**
      * You shouldn't define first page = 0.
      * Let define firstPage = 'number viewpager size' to make endless carousel
@@ -210,9 +212,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 });
             }
 
-            /*if (vidFound) {
+            if (vidFound) {
                 initializeVideoPlayer();
-            }*/
+            }
         }
     }
 
@@ -257,7 +259,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     protected void onStart() {
         Log.i(LOGTAG, "onStart: ==========================");
         super.onStart();
-        EventBus.getDefault().register(this);
         PowerManager powerMgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerMgr.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "WakeLock1");
         wakeLock.acquire();
@@ -286,16 +287,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void onStop() {
-        EventBus.getDefault().unregister(this);
         wakeLock.release();
         finish();   //!! Warning: this will also kill this activity
 //        pause();
         super.onStop();
-    }
-
-    @Subscribe
-    public void onEvent(int imageFilePosition) {
-        setPagerData(imageFilePosition);
     }
 
     @Override
@@ -990,5 +985,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             Log.e(LOGTAG, "unregisterHandlers: unregistered handler " + handler.getRequestName());
         }
         messageHandlers.clear();
+    }
+
+    @Override
+    public void getImagePosition(int imageFilePosition) {
+        setPagerData(imageFilePosition);
     }
 }
