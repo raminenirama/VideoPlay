@@ -70,7 +70,7 @@ public class ItemFragment extends Fragment {
         TextView textView = linearLayout.findViewById(R.id.text);
         CarouselLinearLayout root = linearLayout.findViewById(R.id.root_container);
         imageView = linearLayout.findViewById(R.id.pagerImg);
-        getImagesFromSDCARD();
+
         textView.setText("Music: " + position);
         imageView.setLayoutParams(layoutParams);
         VideoAppSingleton.INSTANCE.setTotalCountOfImage(imageFilesPathList.size());
@@ -120,15 +120,5 @@ public class ItemFragment extends Fragment {
         Objects.requireNonNull(getActivity()).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         screenHeight = displaymetrics.heightPixels;
         screenWidth = displaymetrics.widthPixels;
-    }
-
-    private void getImagesFromSDCARD() {
-        File file = new File(Environment.getExternalStorageDirectory(), "CuraContents/images");
-        if (file.isDirectory()) {
-            File[] listFile = file.listFiles();
-            for (File file1 : listFile) {
-                imageFilesPathList.add(file1.getAbsolutePath());
-            }
-        }
     }
 }

@@ -9,6 +9,7 @@ import com.samsung.vidplay.R;
 import com.samsung.vidplay.ui.ItemFragment;
 import com.samsung.vidplay.ui.MainActivity;
 import com.samsung.vidplay.utils.CarouselLinearLayout;
+import com.samsung.vidplay.utils.VideoAppSingleton;
 
 public class CarouselPagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
 
@@ -34,7 +35,7 @@ public class CarouselPagerAdapter extends FragmentPagerAdapter implements ViewPa
             else
                 scale = SMALL_SCALE;
 
-            position = position % MainActivity.count;
+            position = position % VideoAppSingleton.INSTANCE.getTotalCountOfImage();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,7 +47,7 @@ public class CarouselPagerAdapter extends FragmentPagerAdapter implements ViewPa
     public int getCount() {
         int count = 0;
         try {
-            count = MainActivity.count;
+            count = VideoAppSingleton.INSTANCE.getTotalCountOfImage();
         } catch (Exception e) {
             e.printStackTrace();
         }

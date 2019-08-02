@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.MediaStore;
@@ -40,7 +41,6 @@ import com.samsung.vidplay.interfaces.GetImagePositionCallback;
 import com.samsung.vidplay.utils.VideoAppSingleton;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,8 +97,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     public ViewPager albumsPager;
     public CarouselPagerAdapter adapter;
 
-    public static int count = VideoAppSingleton.INSTANCE.getTotalCountOfImage();
-
     /**
      * You shouldn't define first page = 0.
      * Let define firstPage = 'number viewpager size' to make endless carousel
@@ -117,7 +115,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             timeTotal = findViewById(R.id.timeTotal);
             timePast = findViewById(R.id.timePast);
             pastBar = findViewById(R.id.pastBar);
-            setPagerData(FIRST_PAGE);
+
+            getImagesFromSDCARD();
 
             String defaultVideoName = "TheFrame.ts";
             String featureVideoName = null;
@@ -978,6 +977,20 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         for (ClientMessageHandler handler : messageHandlers) {
             smeshProxy.registerMessageHandler(handler, VidPlayApp.APP_NAME);
             Log.e(LOGTAG, "registerHandlers: registered handler " + handler.getRequestName());
+        }
+    }
+
+    private void getImagesFromSDCARD() {
+        ArrayList<String> imageFilesPathList = new ArrayList<>();
+        File file = new File(Environment.getExternalStorageDirectory(), "CuraContents/images");
+        if (file.isDirectory()) {
+            File[] listFile = file.listFiles();
+            for (File file1 : listFile) {
+                imageFilesPathList.add(file1.getAbsolutePath());
+            }
+            VideoAppSingleton.INSTANCE.setTotalCountOfImage(imageFilesPathList.size());
+            VideoAppSingleton.INSTANCE.setImageFilesPathList(imageFilesPathList);
+            setPagerData(FIRST_PAGE);
         }
     }
 
