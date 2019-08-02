@@ -67,7 +67,7 @@ public class ItemFragment extends Fragment {
         TextView textView = linearLayout.findViewById(R.id.text);
         CarouselLinearLayout root = linearLayout.findViewById(R.id.root_container);
         imageView = linearLayout.findViewById(R.id.pagerImg);
-        //getImagesFromSDCARD();
+        getImagesFromSDCARD();
         textView.setText("Music: " + position);
         imageView.setLayoutParams(layoutParams);
         Drawable drawable = Drawable.createFromPath(imageFilesPathList.get(position));
