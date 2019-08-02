@@ -38,6 +38,7 @@ import com.samsung.vidplay.VidPlayApp;
 import com.samsung.vidplay.controllers.CarouselPagerAdapter;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,7 +113,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             timeTotal = findViewById(R.id.timeTotal);
             timePast = findViewById(R.id.timePast);
             pastBar = findViewById(R.id.pastBar);
-            setPagerData();
+            setPagerData(FIRST_PAGE);
 
             String defaultVideoName = "TheFrame.ts";
             String featureVideoName = null;
@@ -215,18 +216,21 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-    private void setPagerData() {
+    private void setPagerData(int imageFilePosition) {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int pageMargin = ((metrics.widthPixels / 4) * 2);
         albumsPager.setPageMargin(-pageMargin);
 
-        adapter = new CarouselPagerAdapter(this, getSupportFragmentManager());
-        albumsPager.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        } else {
+            adapter = new CarouselPagerAdapter(this, getSupportFragmentManager());
+            albumsPager.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
         albumsPager.addOnPageChangeListener(adapter);
-        albumsPager.setCurrentItem(FIRST_PAGE);
+        albumsPager.setCurrentItem(imageFilePosition);
         albumsPager.setOffscreenPageLimit(3);
     }
 
@@ -253,6 +257,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     protected void onStart() {
         Log.i(LOGTAG, "onStart: ==========================");
         super.onStart();
+        EventBus.getDefault().register(this);
         PowerManager powerMgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerMgr.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "WakeLock1");
         wakeLock.acquire();
@@ -281,10 +286,16 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void onStop() {
+        EventBus.getDefault().unregister(this);
         wakeLock.release();
         finish();   //!! Warning: this will also kill this activity
 //        pause();
         super.onStop();
+    }
+
+    @Subscribe
+    public void onEvent(int imageFilePosition) {
+        setPagerData(imageFilePosition);
     }
 
     @Override

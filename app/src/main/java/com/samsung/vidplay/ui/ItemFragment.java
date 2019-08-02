@@ -93,7 +93,8 @@ public class ItemFragment extends Fragment {
         if (!TextUtils.isEmpty(imageFilePath) && !imageFilesPathList.isEmpty()) {
             for (String imagePathFromList : imageFilesPathList) {
                 if (imagePathFromList.equalsIgnoreCase(imageFilePath)) {
-                    MainActivity.FIRST_PAGE = imageFilesPathList.indexOf(imageFilePath);
+                    int positionOfImage = imageFilesPathList.indexOf(imageFilePath);
+                    EventBus.getDefault().postSticky(positionOfImage);
                 }
             }
         }
