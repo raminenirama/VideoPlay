@@ -94,7 +94,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private int durationSecs;
     public ViewPager albumsPager;
     public CarouselPagerAdapter adapter;
-    public static int count = 5;
+    public static int count = 2;
     /**
      * You shouldn't define first page = 0.
      * Let define firstPage = 'number viewpager size' to make endless carousel
@@ -210,9 +210,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 });
             }
 
-            /*if (vidFound) {
+            if (vidFound) {
                 initializeVideoPlayer();
-            }*/
+            }
         }
     }
 
@@ -501,9 +501,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         //       Uri videoUri = getVideoUri( videoFilename );
         if (videoFilename != null) {
             if (videoPlayer == null) {
-                /*surfaceView = findViewById(R.id.surface);
+                surfaceView = findViewById(R.id.surface);
                 surfaceHolder = surfaceView.getHolder();
-                surfaceHolder.addCallback(this);*/
+                surfaceHolder.addCallback(this);
 
                 videoPlayer = new MediaPlayer();
                 mediaPlayer = videoPlayer;
