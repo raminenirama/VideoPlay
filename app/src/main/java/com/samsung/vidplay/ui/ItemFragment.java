@@ -1,8 +1,6 @@
 package com.samsung.vidplay.ui;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,7 +36,7 @@ public class ItemFragment extends Fragment {
     private int screenHeight;
     private ImageView imageView;
 
-    private ArrayList<String> files = new ArrayList<>();
+    private ArrayList<String> imageFilesPathList = new ArrayList<>();
 
     public static Fragment newInstance(MainActivity context, int pos, float scale) {
         Bundle b = new Bundle();
@@ -72,8 +70,8 @@ public class ItemFragment extends Fragment {
         //getImagesFromSDCARD();
         textView.setText("Music: " + position);
         imageView.setLayoutParams(layoutParams);
-        //Drawable drawable = Drawable.createFromPath(files.get(position));
-        //imageView.setImageDrawable(drawable);
+        Drawable drawable = Drawable.createFromPath(imageFilesPathList.get(position));
+        imageView.setImageDrawable(drawable);
         root.setScaleBoth(scale);
         return linearLayout;
     }
@@ -92,9 +90,12 @@ public class ItemFragment extends Fragment {
 
     @Subscribe
     public void onEvent(String imageFilePath) {
-        if (!TextUtils.isEmpty(imageFilePath)) {
-            Drawable drawable = Drawable.createFromPath(imageFilePath);
-            imageView.setImageDrawable(drawable);
+        if (!TextUtils.isEmpty(imageFilePath) && !imageFilesPathList.isEmpty()) {
+            for (String imagePathFromList : imageFilesPathList) {
+                if (imagePathFromList.equalsIgnoreCase(imageFilePath)) {
+                    MainActivity.FIRST_PAGE = imageFilesPathList.indexOf(imageFilePath);
+                }
+            }
         }
     }
 
@@ -113,7 +114,7 @@ public class ItemFragment extends Fragment {
         if (file.isDirectory()) {
             File[] listFile = file.listFiles();
             for (File file1 : listFile) {
-                files.add(file1.getAbsolutePath());
+                imageFilesPathList.add(file1.getAbsolutePath());
             }
         }
     }
