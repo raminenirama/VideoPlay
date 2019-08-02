@@ -96,7 +96,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     public static int count = 5;
     /**
      * You shouldn't define first page = 0.
-     * Let define firstpage = 'number viewpager size' to make endless carousel
+     * Let define firstPage = 'number viewpager size' to make endless carousel
      */
     public static int FIRST_PAGE = 0;
 
