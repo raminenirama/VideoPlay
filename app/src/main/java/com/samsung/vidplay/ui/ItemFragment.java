@@ -39,8 +39,6 @@ public class ItemFragment extends Fragment {
     private ImageView imageView;
     private GetImagePositionCallback getImagePositionCallback;
 
-    private ArrayList<String> imageFilesPathList = new ArrayList<>();
-
     public static Fragment newInstance(MainActivity context, int pos, float scale) {
         Bundle b = new Bundle();
         b.putInt(POSITON, pos);
@@ -73,8 +71,7 @@ public class ItemFragment extends Fragment {
 
         textView.setText("Music: " + position);
         imageView.setLayoutParams(layoutParams);
-        VideoAppSingleton.INSTANCE.setTotalCountOfImage(imageFilesPathList.size());
-        Drawable drawable = Drawable.createFromPath(imageFilesPathList.get(position));
+        Drawable drawable = Drawable.createFromPath(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(position));
         imageView.setImageDrawable(drawable);
         root.setScaleBoth(scale);
         return linearLayout;
@@ -101,10 +98,10 @@ public class ItemFragment extends Fragment {
 
     @Subscribe
     public void onEvent(String imageFilePath) {
-        if (!TextUtils.isEmpty(imageFilePath) && !imageFilesPathList.isEmpty()) {
-            for (String imagePathFromList : imageFilesPathList) {
+        if (!TextUtils.isEmpty(imageFilePath) && !VideoAppSingleton.INSTANCE.getImageFilesPathList().isEmpty()) {
+            for (String imagePathFromList : VideoAppSingleton.INSTANCE.getImageFilesPathList()) {
                 if (imagePathFromList.equalsIgnoreCase(imageFilePath)) {
-                    int positionOfImage = imageFilesPathList.indexOf(imageFilePath);
+                    int positionOfImage = VideoAppSingleton.INSTANCE.getImageFilesPathList().indexOf(imageFilePath);
                     if(getImagePositionCallback != null)
                         getImagePositionCallback.getImagePosition(positionOfImage);
                 }
