@@ -234,7 +234,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
         albumsPager.addOnPageChangeListener(adapter);
         albumsPager.setCurrentItem(imageFilePosition);
-        albumsPager.setOffscreenPageLimit(3);
+        albumsPager.setOffscreenPageLimit(10);
     }
 
     private void checkForPermissions() {
@@ -674,7 +674,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     private void stop() {
         Log.i(LOGTAG, "stop: state: " + state);
-        mediaPlayer.stop();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
         state = State.STOPED;
     }
 
@@ -688,13 +690,15 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     private void pause() {
         Log.i(LOGTAG, "pause: state: " + state);
-        mediaPlayer.pause();
+        if (mediaPlayer != null)
+            mediaPlayer.pause();
         state = State.PAUSED;
     }
 
     private void release() {
         Log.i(LOGTAG, "release: state: " + state);
-        videoPlayer.release();
+        if (videoPlayer != null)
+            videoPlayer.release();
         state = State.END;
     }
 
@@ -916,6 +920,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
                 Response response = message.createResponseMessage();
                 response.setResponseText("OnButtonPressed Completed");
+
                 smeshProxy.sendResponse(response);
             }
         });
@@ -1004,6 +1009,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     public void getImagePosition(int imageFilePosition) {
-        setPagerData(imageFilePosition);
+        albumsPager.setCurrentItem(imageFilePosition);
+        adapter.notifyDataSetChanged();
     }
 }
