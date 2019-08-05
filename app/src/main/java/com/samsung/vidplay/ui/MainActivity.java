@@ -924,6 +924,38 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 smeshProxy.sendResponse(response);
             }
         });
+        messageHandlers.add(new ClientMessageHandler("VidPlay_PlaySoundtrack_Next") {
+            @Override
+            public void handleMessage(Message message) throws RemoteException {
+
+                boolean loop = message.getParamBoolean("loop");
+                int startPosMillis = (int) message.getParamLong("startPosMillis");
+
+                showImage(true, imageName, false, 0);
+                playTrack(soundtrackFilename, loop, startPosMillis);
+
+                Response response = message.createResponseMessage();
+                response.setResponseText("OnButtonPressed Completed");
+
+                smeshProxy.sendResponse(response);
+            }
+        });
+        messageHandlers.add(new ClientMessageHandler("VidPlay_PlaySoundtrack_Previous") {
+            @Override
+            public void handleMessage(Message message) throws RemoteException {
+
+                boolean loop = message.getParamBoolean("loop");
+                int startPosMillis = (int) message.getParamLong("startPosMillis");
+
+                showImage(true, imageName, false, 0);
+                playTrack(soundtrackFilename, loop, startPosMillis);
+
+                Response response = message.createResponseMessage();
+                response.setResponseText("OnButtonPressed Completed");
+
+                smeshProxy.sendResponse(response);
+            }
+        });
         messageHandlers.add(new ClientMessageHandler("VidPlay_ShowImage") {
             @Override
             public void handleMessage(Message message) throws RemoteException {
