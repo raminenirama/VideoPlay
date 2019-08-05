@@ -927,12 +927,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         messageHandlers.add(new ClientMessageHandler("VidPlay_PlaySoundtrack_Next") {
             @Override
             public void handleMessage(Message message) throws RemoteException {
-
-                boolean loop = message.getParamBoolean("loop");
-                int startPosMillis = (int) message.getParamLong("startPosMillis");
-
-                showImage(true, imageName, false, 0);
-                playTrack(soundtrackFilename, loop, startPosMillis);
+                // Todo add Next
 
                 Response response = message.createResponseMessage();
                 response.setResponseText("OnButtonPressed Completed");
@@ -943,12 +938,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         messageHandlers.add(new ClientMessageHandler("VidPlay_PlaySoundtrack_Previous") {
             @Override
             public void handleMessage(Message message) throws RemoteException {
-
-                boolean loop = message.getParamBoolean("loop");
-                int startPosMillis = (int) message.getParamLong("startPosMillis");
-
-                showImage(true, imageName, false, 0);
-                playTrack(soundtrackFilename, loop, startPosMillis);
+                // Todo add Previous
 
                 Response response = message.createResponseMessage();
                 response.setResponseText("OnButtonPressed Completed");
