@@ -1031,6 +1031,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             for (Integer key : VideoAppSingleton.INSTANCE.getImageFilesPathList().keySet()) {
                 if (Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(key)).getTrackPath().equalsIgnoreCase(trackFullPath)) {
                     int currentTrackPosition = key;
+                    VideoAppSingleton.INSTANCE.setPositionOfTrack(currentTrackPosition);
                     System.out.println("track position is" + currentTrackPosition);
                 }
             }
@@ -1038,11 +1039,24 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     }
 
     private void getPreviousTrackFromList() {
-
+        int trackPositionFromList = VideoAppSingleton.INSTANCE.getPositionOfTrack();
+        int nextPosition = trackPositionFromList - 1;
+        if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null) {
+            VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPosition).getImagePath();
+            String trackpath=VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPosition).getTrackPath();
+            System.out.println("track next is"+trackpath);
+        }
     }
 
     private void getNextTrackFromList() {
-
+        int trackPositionFromList = VideoAppSingleton.INSTANCE.getPositionOfTrack();
+        int nextPosition = trackPositionFromList + 1;
+        if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null) {
+            VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPosition).getImagePath();
+            String trackpath=VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPosition).getTrackPath();
+            System.out.println("track next is"+trackpath);
+        }
+        //playTrack(soundtrackFilename, loop, startPosMillis);
     }
 
     private void getMediaContent() {
