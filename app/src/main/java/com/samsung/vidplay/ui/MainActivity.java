@@ -9,7 +9,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.MediaStore;
@@ -38,7 +37,7 @@ import com.samsung.vidplay.R;
 import com.samsung.vidplay.VidPlayApp;
 import com.samsung.vidplay.controllers.CarouselPagerAdapter;
 import com.samsung.vidplay.interfaces.GetImagePositionCallback;
-import com.samsung.vidplay.utils.VideoAppSingleton;
+import com.samsung.vidplay.utils.PlayListManager;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -116,7 +115,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             timePast = findViewById(R.id.timePast);
             pastBar = findViewById(R.id.pastBar);
 
-            getImagesFromSDCARD();
+            getMediaContent();
 
             String defaultVideoName = "TheFrame.ts";
             String featureVideoName = null;
@@ -152,7 +151,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 @Override
                 public void run() {
                     int pos = 0;
-                    if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    if (mediaPlayer == null) {
+                        mediaPlayer = new MediaPlayer();
+                    }
+                    if (mediaPlayer.isPlaying()) {
                         pos = mediaPlayer.getCurrentPosition();
                     }
                     updateProgressBar(pos / 1000);
@@ -592,8 +594,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
         synchronized (this) {
             unregisterHandlers();
-            smeshProxy.disconnect();
-            smeshProxy = null;
+            if (smeshProxy != null) {
+                smeshProxy.disconnect();
+                smeshProxy = null;
+            }
         }
         release();
         super.onDestroy();
@@ -1007,18 +1011,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-    private void getImagesFromSDCARD() {
-        ArrayList<String> imageFilesPathList = new ArrayList<>();
-        File file = new File(Environment.getExternalStorageDirectory(), "CuraContents/images");
-        if (file.isDirectory()) {
-            File[] listFile = file.listFiles();
-            for (File file1 : listFile) {
-                imageFilesPathList.add(file1.getAbsolutePath());
-            }
-            VideoAppSingleton.INSTANCE.setTotalCountOfImage(imageFilesPathList.size());
-            VideoAppSingleton.INSTANCE.setImageFilesPathList(imageFilesPathList);
-            setPagerData(FIRST_PAGE);
-        }
+    private void getMediaContent() {
+        PlayListManager playListManager = new PlayListManager();
+        playListManager.getMediaContentFromSDCARD();
+        setPagerData(FIRST_PAGE);
     }
 
     private void unregisterHandlers() {
@@ -1031,7 +1027,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     public void getImagePosition(int imageFilePosition) {
-        albumsPager.setCurrentItem(imageFilePosition);
         adapter.notifyDataSetChanged();
+        albumsPager.setCurrentItem(imageFilePosition);
     }
 }

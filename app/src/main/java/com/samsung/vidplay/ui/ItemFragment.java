@@ -27,7 +27,9 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
 
 public class ItemFragment extends Fragment {
 
@@ -71,7 +73,7 @@ public class ItemFragment extends Fragment {
 
         textView.setText("Music: " + position);
         imageView.setLayoutParams(layoutParams);
-        Drawable drawable = Drawable.createFromPath(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(position));
+        Drawable drawable = Drawable.createFromPath(Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(position)).getImagePath());
         imageView.setImageDrawable(drawable);
         root.setScaleBoth(scale);
         return linearLayout;
@@ -99,19 +101,15 @@ public class ItemFragment extends Fragment {
     @Subscribe
     public void onEvent(String imageFilePath) {
         if (!TextUtils.isEmpty(imageFilePath) && !VideoAppSingleton.INSTANCE.getImageFilesPathList().isEmpty()) {
-            for (String imagePathFromList : VideoAppSingleton.INSTANCE.getImageFilesPathList()) {
-                if (imagePathFromList.equalsIgnoreCase(imageFilePath)) {
-                    int positionOfImage = VideoAppSingleton.INSTANCE.getImageFilesPathList().indexOf(imageFilePath);
-                    if(getImagePositionCallback != null)
-                        getImagePositionCallback.getImagePosition(positionOfImage);
+            for (Integer key : VideoAppSingleton.INSTANCE.getImageFilesPathList().keySet()) {
+                if (Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(key)).getImagePath().equalsIgnoreCase(imageFilePath)) {
+                    getImagePositionCallback.getImagePosition(key);
                 }
             }
         }
     }
 
-    /**
-     * Get device screen width and height
-     */
+    /*---Get device screen width and height---*/
     private void getWidthAndHeight() {
         DisplayMetrics displaymetrics = new DisplayMetrics();
         Objects.requireNonNull(getActivity()).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);

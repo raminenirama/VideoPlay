@@ -1,28 +1,23 @@
 package com.samsung.vidplay.utils;
 
-import java.util.ArrayList;
+import com.samsung.vidplay.infobean.PlayListInfo;
+
+import java.util.Hashtable;
 
 public enum VideoAppSingleton {
 
     INSTANCE;
+    Hashtable<Integer, PlayListInfo> imageFilesPathList;
 
-    int totalCountOfImage=0;
-
-    ArrayList<String> imageFilesPathList;
-
-    public void setTotalCountOfImage(int totalCountOfImage) {
-        this.totalCountOfImage = totalCountOfImage;
+    public Hashtable<Integer, PlayListInfo> getImageFilesPathList() {
+        return imageFilesPathList;
     }
 
-    public int getTotalCountOfImage() {
-        return totalCountOfImage;
-    }
-
-    public void setImageFilesPathList(ArrayList<String> imageFilesPathList) {
+    public void setImageFilesPathList(Hashtable<Integer, PlayListInfo> imageFilesPathList) {
         this.imageFilesPathList = imageFilesPathList;
     }
 
-    public ArrayList<String> getImageFilesPathList() {
-        return imageFilesPathList;
+    public int getTotalCountOfImage() {
+        return imageFilesPathList.size();
     }
 }
