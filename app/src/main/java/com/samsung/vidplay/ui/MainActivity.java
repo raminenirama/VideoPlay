@@ -150,22 +150,26 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             statusTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    int pos = 0;
-                    if (mediaPlayer == null) {
-                        mediaPlayer = new MediaPlayer();
-                    }
-                    if (mediaPlayer.isPlaying()) {
-                        pos = mediaPlayer.getCurrentPosition();
-                    }
-                    updateProgressBar(pos / 1000);
-                    if (sendStatus) {
-                        Message message = new Message("VidPlay_PlayerStatus");
-                        message.setExpectingResponse(false);
-                        message.setParamInteger("postion", pos);
-                        message.setParamInteger("volume", volume);
-                        message.setParamBoolean("isPlaying", mediaPlayer.isPlaying());
-                        message.setLoggable(false);
-                        smeshProxy.sendRequest(message, requesterSmeshNode, null);
+                    try {
+                        int pos = 0;
+                        if (mediaPlayer == null) {
+                            mediaPlayer = new MediaPlayer();
+                        }
+                        if (mediaPlayer.isPlaying()) {
+                            pos = mediaPlayer.getCurrentPosition();
+                        }
+                        updateProgressBar(pos / 1000);
+                        if (sendStatus) {
+                            Message message = new Message("VidPlay_PlayerStatus");
+                            message.setExpectingResponse(false);
+                            message.setParamInteger("postion", pos);
+                            message.setParamInteger("volume", volume);
+                            message.setParamBoolean("isPlaying", mediaPlayer.isPlaying());
+                            message.setLoggable(false);
+                            smeshProxy.sendRequest(message, requesterSmeshNode, null);
+                        }
+                    } catch (IllegalStateException e) {
+                        e.printStackTrace();
                     }
                 }
             }, 900, 900);
