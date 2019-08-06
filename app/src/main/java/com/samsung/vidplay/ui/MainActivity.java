@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -38,6 +39,7 @@ import com.samsung.vidplay.VidPlayApp;
 import com.samsung.vidplay.controllers.CarouselPagerAdapter;
 import com.samsung.vidplay.interfaces.GetImagePositionCallback;
 import com.samsung.vidplay.utils.PlayListManager;
+import com.samsung.vidplay.utils.VideoAppSingleton;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -45,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -925,6 +928,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
                 showImage(true, imageName, false, 0);
                 playTrack(soundtrackFilename, loop, startPosMillis);
+                getPositionOfTrack(soundtrackFilename);
 
                 Response response = message.createResponseMessage();
                 response.setResponseText("OnButtonPressed Completed");
@@ -937,6 +941,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             public void handleMessage(Message message) throws RemoteException {
                 // Todo add Next
 
+                getNextTrackFromList();
+
                 Response response = message.createResponseMessage();
                 response.setResponseText("OnButtonPressed Completed");
 
@@ -947,6 +953,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             @Override
             public void handleMessage(Message message) throws RemoteException {
                 // Todo add Previous
+
+                getPreviousTrackFromList();
 
                 Response response = message.createResponseMessage();
                 response.setResponseText("OnButtonPressed Completed");
@@ -1013,6 +1021,28 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             smeshProxy.registerMessageHandler(handler, VidPlayApp.APP_NAME);
             Log.e(LOGTAG, "registerHandlers: registered handler " + handler.getRequestName());
         }
+    }
+
+    private void getPositionOfTrack(String soundtrackFilename) {
+        File tracksDir = new File(FileUtils.getCuraContentsDirectory(MainActivity.this), "tracks");
+        File trackPath = new File(tracksDir, soundtrackFilename);
+        String trackFullPath = trackPath.getAbsolutePath();
+        if (!TextUtils.isEmpty(trackFullPath) && !VideoAppSingleton.INSTANCE.getImageFilesPathList().isEmpty()) {
+            for (Integer key : VideoAppSingleton.INSTANCE.getImageFilesPathList().keySet()) {
+                if (Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(key)).getTrackPath().equalsIgnoreCase(trackFullPath)) {
+                    int currentTrackPosition = key;
+                    System.out.println("track position is" + currentTrackPosition);
+                }
+            }
+        }
+    }
+
+    private void getPreviousTrackFromList() {
+
+    }
+
+    private void getNextTrackFromList() {
+
     }
 
     private void getMediaContent() {
