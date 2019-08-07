@@ -1,6 +1,7 @@
 package com.samsung.vidplay.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -265,12 +266,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
+    @SuppressLint("InvalidWakeLockTag")
     @Override
     protected void onStart() {
         Log.i(LOGTAG, "onStart: ==========================");
         super.onStart();
         PowerManager powerMgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock = powerMgr.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "WakeLock1");
+        wakeLock = Objects.requireNonNull(powerMgr).newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "WakeLock1");
         wakeLock.acquire();
 //        if ( state == State.PAUSED ) {
 //            start();
@@ -375,21 +377,44 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         mediaPlayer.setVolume(mediaVolume, mediaVolume);
     }
 
+    public void playTrackFromList(String trackPath, boolean loop, int startPosMillis) {
+        enableVolume(false);
+        if (audioPlayer != null) {
+            audioPlayer.release();
+        }
+
+        audioPlayer = new MediaPlayer();
+        audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer aPlayer) {
+                stopTrack();
+            }
+        });
+
+        try {
+            audioPlayer.setLooping(loop);
+            audioPlayer.setDataSource(trackPath);
+            audioPlayer.prepare();
+            durationSecs = audioPlayer.getDuration() / 1000;
+
+            Log.i(LOGTAG, "playTrack: start play music: startPosMillis: " + startPosMillis + ", durationSecs: " + durationSecs);
+            audioPlayer.start();
+            if (startPosMillis > 0)
+                audioPlayer.seekTo(startPosMillis);
+            mediaPlayer = audioPlayer;
+            enableVolume(true);
+            updateProgressBar(startPosMillis / 1000);
+        } catch (IOException ex) {
+            Log.i(LOGTAG, "playTrack: IOException: " + ex.getLocalizedMessage(), ex);
+        }
+    }
+
     private void playTrack(String trackFilename, boolean loop, int startPosMillis) {
         Log.i(LOGTAG, "playTrack: trackFilename: " + trackFilename + ", loop: " + loop + ", startPosMillis: " + startPosMillis);
         enableVolume(false);
         if (audioPlayer != null) {
             audioPlayer.release();
         }
-
-//        AudioManager audioMgr = (AudioManager) getSystemService( Context.AUDIO_SERVICE );
-//        int res = audioMgr.requestAudioFocus( new AudioManager.OnAudioFocusChangeListener() {
-//            @Override
-//            public void onAudioFocusChange( int focusChange ) {
-//                Log.i( LOGTAG, "playTrack: onAudioFocusChange: focusChange: "+ focusChange );
-//            }
-//        }, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN );
-
         File imageDir = new File(FileUtils.getCuraContentsDirectory(MainActivity.this), "tracks");
         File imagePath = new File(imageDir, trackFilename);
 
@@ -397,13 +422,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer aPlayer) {
-                // lets play the default attractor video
                 stopTrack();
-//                mediaPlayer = videoPlayer;
-//                enableVolume( true );
-//                showImage( false, null, false, 0 );
-//                audioPlayer.release();
-//                audioPlayer = null;
             }
         });
 
@@ -418,8 +437,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             if (startPosMillis > 0)
                 audioPlayer.seekTo(startPosMillis);
             mediaPlayer = audioPlayer;
-//            float mediaVolume = volume / 100.0f;
-//            mediaPlayer.setVolume( mediaVolume, mediaVolume );
             enableVolume(true);
             updateProgressBar(startPosMillis / 1000);
         } catch (IOException ex) {
@@ -988,11 +1005,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 } else {
                     volume = message.getParamInteger("volume");
                 }
-//                    float mediaVolume = volume / 100.0f;
-//                    mediaPlayer.setVolume( mediaVolume, mediaVolume );
-//                    Log.i( LOGTAG, "VidPlay_Volume: volume: "+ volume +", mediaVolume: "+ mediaVolume );
                 enableVolume(true);
-
                 Response response = message.createResponseMessage();
                 response.setResponseText("Setting Volume completed");
                 smeshProxy.sendResponse(response);
@@ -1032,31 +1045,43 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 if (Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(key)).getTrackPath().equalsIgnoreCase(trackFullPath)) {
                     int currentTrackPosition = key;
                     VideoAppSingleton.INSTANCE.setPositionOfTrack(currentTrackPosition);
-                    System.out.println("track position is" + currentTrackPosition);
                 }
             }
         }
     }
 
+    /**
+     * Get previous Track from list
+     */
     private void getPreviousTrackFromList() {
         int trackPositionFromList = VideoAppSingleton.INSTANCE.getPositionOfTrack();
-        int nextPosition = trackPositionFromList - 1;
-        if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null) {
-            VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPosition).getImagePath();
-            String trackpath=VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPosition).getTrackPath();
-            System.out.println("track next is"+trackpath);
+        int nextPositionOfTrack = trackPositionFromList - 1;
+        if (nextPositionOfTrack > 0) {
+            if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null) {
+                VideoAppSingleton.INSTANCE.setPositionOfTrack(nextPositionOfTrack);
+                String imageFilePath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getImagePath();
+                String trackFilepath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getTrackPath();
+                showImage(true, imageFilePath, false, 0);
+                playTrackFromList(trackFilepath, false, 0);
+            }
         }
     }
 
+    /**
+     * Get next Track from list
+     */
     private void getNextTrackFromList() {
         int trackPositionFromList = VideoAppSingleton.INSTANCE.getPositionOfTrack();
-        int nextPosition = trackPositionFromList + 1;
-        if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null) {
-            VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPosition).getImagePath();
-            String trackpath=VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPosition).getTrackPath();
-            System.out.println("track next is"+trackpath);
+        int nextPositionOfTrack = trackPositionFromList + 1;
+        if (nextPositionOfTrack > 0) {
+            if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null) {
+                VideoAppSingleton.INSTANCE.setPositionOfTrack(nextPositionOfTrack);
+                String imageFilePath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getImagePath();
+                String trackFilepath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getTrackPath();
+                showImage(true, imageFilePath, false, 0);
+                playTrackFromList(trackFilepath, false, 0);
+            }
         }
-        //playTrack(soundtrackFilename, loop, startPosMillis);
     }
 
     private void getMediaContent() {
