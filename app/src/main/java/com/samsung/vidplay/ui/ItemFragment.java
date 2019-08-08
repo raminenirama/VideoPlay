@@ -3,7 +3,6 @@ package com.samsung.vidplay.ui;
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -25,11 +24,8 @@ import com.samsung.vidplay.utils.VideoAppSingleton;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Enumeration;
 import java.util.Objects;
-import java.util.Set;
 
 public class ItemFragment extends Fragment {
 
@@ -101,9 +97,13 @@ public class ItemFragment extends Fragment {
     @Subscribe
     public void onEvent(String imageFilePath) {
         if (!TextUtils.isEmpty(imageFilePath) && !VideoAppSingleton.INSTANCE.getImageFilesPathList().isEmpty()) {
-            for (Integer key : VideoAppSingleton.INSTANCE.getImageFilesPathList().keySet()) {
-                if (Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(key)).getImagePath().equalsIgnoreCase(imageFilePath)) {
+            Enumeration<Integer> enumeration = VideoAppSingleton.INSTANCE.getImageFilesPathList().keys();
+            while (enumeration.hasMoreElements()) {
+                Integer key = enumeration.nextElement();
+                if (Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(key)).
+                        getImagePath().equalsIgnoreCase(imageFilePath)) {
                     getImagePositionCallback.getImagePosition(key);
+                    System.out.println("get call from eventbus" + key);
                 }
             }
         }

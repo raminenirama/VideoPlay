@@ -120,6 +120,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             pastBar = findViewById(R.id.pastBar);
 
             getMediaContent();
+            setPagerData(FIRST_PAGE);
 
             String defaultVideoName = "TheFrame.ts";
             String featureVideoName = null;
@@ -347,7 +348,6 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                                   File imageDir = new File(FileUtils.getCuraContentsDirectory(MainActivity.this), "images");
                                   File imagePath = new File(imageDir, imageFilename);
                                   String pathName = imagePath.getAbsolutePath();
-                                  //send imagefilepath into EventBus
                                   EventBus.getDefault().postSticky(pathName);
                                   imagePane.setVisibility(View.VISIBLE);
                                   if (autoExit) {
@@ -374,7 +374,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             mediaVolume = volume / 100.0f;
         }
         Log.i(LOGTAG, "enableVolume: volume: " + volume + ", mediaVolume: " + mediaVolume + ", enable: " + enable);
-        mediaPlayer.setVolume(mediaVolume, mediaVolume);
+        if (mediaPlayer != null)
+            mediaPlayer.setVolume(mediaVolume, mediaVolume);
     }
 
     public void playTrackFromList(String trackPath, boolean loop, int startPosMillis) {
@@ -1056,12 +1057,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private void getPreviousTrackFromList() {
         int trackPositionFromList = VideoAppSingleton.INSTANCE.getPositionOfTrack();
         int nextPositionOfTrack = trackPositionFromList - 1;
-        if (nextPositionOfTrack > 0) {
+        if (nextPositionOfTrack >= 0) {
             if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null) {
                 VideoAppSingleton.INSTANCE.setPositionOfTrack(nextPositionOfTrack);
                 String imageFilePath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getImagePath();
                 String trackFilepath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getTrackPath();
-                showImage(true, imageFilePath, false, 0);
+                String fileName = imageFilePath.substring( imageFilePath.lastIndexOf('/')+1);
+                showImage(true, fileName, false, 0);
                 playTrackFromList(trackFilepath, false, 0);
             }
         }
@@ -1078,16 +1080,16 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 VideoAppSingleton.INSTANCE.setPositionOfTrack(nextPositionOfTrack);
                 String imageFilePath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getImagePath();
                 String trackFilepath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getTrackPath();
-                showImage(true, imageFilePath, false, 0);
+                String fileName = imageFilePath.substring( imageFilePath.lastIndexOf('/')+1);
+                showImage(true, fileName, false, 0);
                 playTrackFromList(trackFilepath, false, 0);
             }
         }
     }
 
-    private void getMediaContent() {
+    private synchronized void getMediaContent() {
         PlayListManager playListManager = new PlayListManager();
         playListManager.getMediaContentFromSDCARD();
-        setPagerData(FIRST_PAGE);
     }
 
     private void unregisterHandlers() {
@@ -1100,7 +1102,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     public void getImagePosition(int imageFilePosition) {
-        adapter.notifyDataSetChanged();
         albumsPager.setCurrentItem(imageFilePosition);
+        adapter.notifyDataSetChanged();
     }
 }
