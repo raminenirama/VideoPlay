@@ -11,6 +11,7 @@ import java.util.Hashtable;
 public class PlayListManager {
 
     private Hashtable<Integer, PlayListInfo> fileMap = new Hashtable<>();
+    private String defaultImagePath = "";
 
     public PlayListManager() {
         //empty constructor
@@ -18,20 +19,41 @@ public class PlayListManager {
 
     public void getMediaContentFromSDCARD() {
 
-        ArrayList<String> imageFilesPathList = getImagesPathList();
+        ArrayList<String> albumFilesPathList = getImagesPathList();
         ArrayList<String> trackFilesPathList = getTrackPathList();
 
-        if (imageFilesPathList != null && trackFilesPathList != null) {
-            if (imageFilesPathList.size() == trackFilesPathList.size()) {
-                for (int i = 0; i < imageFilesPathList.size(); i++) {
-                    PlayListInfo info = new PlayListInfo();
-                    info.setImagePath(imageFilesPathList.get(i));
+        //to get default image file from sd-card
+        String MEDIA_IMAGES_PATH = "CuraContents/images/default_image";
+        File fileImages = new File(Environment.getExternalStorageDirectory(), MEDIA_IMAGES_PATH);
+        defaultImagePath = fileImages.getAbsolutePath();
+
+        if (albumFilesPathList != null && trackFilesPathList != null) {
+            for (int i = 0; i < trackFilesPathList.size(); i++) {
+                PlayListInfo info = new PlayListInfo();
+                if (i >= albumFilesPathList.size()) {
+                    info.setImagePath(defaultImagePath);
                     info.setTrackPath(trackFilesPathList.get(i));
-                    fileMap.put(i, info);
+                } else {
+                    String albumName = albumFilesPathList.get(i);
+                    String albumNameNew = albumName.substring(albumName.lastIndexOf('/')+1);
+                    String albumString=stripExtension(albumNameNew);
+                    for (String albumTrack : trackFilesPathList) {
+                        String albumTrackNew = albumTrack.substring(albumTrack.lastIndexOf('/')+1);
+                        String albumTrackString=stripExtension(albumTrackNew);
+                        if (albumString.equals(albumTrackString)) {
+                            info.setImagePath(albumFilesPathList.get(i));
+                            info.setTrackPath(trackFilesPathList.get(i));
+                        }
+                    }
                 }
-                VideoAppSingleton.INSTANCE.setImageFilesPathList(fileMap);
+                fileMap.put(i, info);
             }
+            VideoAppSingleton.INSTANCE.setImageFilesPathList(fileMap);
         }
+    }
+
+    public String stripExtension(String s) {
+        return s != null && s.lastIndexOf(".") > 0 ? s.substring(0, s.lastIndexOf(".")) : s;
     }
 
     /*---Return Tracks Path List---*/
