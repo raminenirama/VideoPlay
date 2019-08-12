@@ -40,7 +40,6 @@ import com.samsung.vidplay.VidPlayApp;
 import com.samsung.vidplay.controllers.CarouselPagerAdapter;
 import com.samsung.vidplay.interfaces.GetImagePositionCallback;
 import com.samsung.vidplay.utils.PlayListManager;
-import com.samsung.vidplay.utils.Utils;
 import com.samsung.vidplay.utils.VideoAppSingleton;
 
 import org.greenrobot.eventbus.EventBus;
@@ -115,8 +114,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         mContext = MainActivity.this;
 
         checkForPermissions();
-        getMediaContent();
-
+        
         if (uncheckedPerms <= 0) {
             albumsPager = findViewById(R.id.albumspager);
             timeTotal = findViewById(R.id.timeTotal);
