@@ -69,7 +69,8 @@ public class ItemFragment extends Fragment {
 
         textView.setText("Music: " + position);
         imageView.setLayoutParams(layoutParams);
-        Drawable drawable = Drawable.createFromPath(Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(position)).getImagePath());
+        String imageFilePath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(position)).getImagePath();
+        Drawable drawable = Drawable.createFromPath(imageFilePath);
         imageView.setImageDrawable(drawable);
         root.setScaleBoth(scale);
         return linearLayout;
@@ -103,7 +104,6 @@ public class ItemFragment extends Fragment {
                 if (Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(key)).
                         getImagePath().equalsIgnoreCase(imageFilePath)) {
                     getImagePositionCallback.getImagePosition(key);
-                    System.out.println("get call from eventbus" + key);
                 }
             }
         }

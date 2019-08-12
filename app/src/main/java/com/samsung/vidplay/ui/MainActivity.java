@@ -22,7 +22,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,13 +40,13 @@ import com.samsung.vidplay.VidPlayApp;
 import com.samsung.vidplay.controllers.CarouselPagerAdapter;
 import com.samsung.vidplay.interfaces.GetImagePositionCallback;
 import com.samsung.vidplay.utils.PlayListManager;
+import com.samsung.vidplay.utils.Utils;
 import com.samsung.vidplay.utils.VideoAppSingleton;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -101,6 +100,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private int durationSecs;
     public ViewPager albumsPager;
     public CarouselPagerAdapter adapter;
+    private Context mContext;
 
     /**
      * You shouldn't define first page = 0.
@@ -112,8 +112,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = MainActivity.this;
 
         checkForPermissions();
+        getMediaContent();
 
         if (uncheckedPerms <= 0) {
             albumsPager = findViewById(R.id.albumspager);
@@ -1064,7 +1066,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
                 VideoAppSingleton.INSTANCE.setPositionOfTrack(nextPositionOfTrack);
                 String imageFilePath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getImagePath();
                 String trackFilepath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getTrackPath();
-                String fileName = imageFilePath.substring( imageFilePath.lastIndexOf('/')+1);
+                String fileName = imageFilePath.substring(imageFilePath.lastIndexOf('/') + 1);
                 showImage(true, fileName, false, 0);
                 playTrackFromList(trackFilepath, false, 0);
             }
@@ -1078,11 +1080,11 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         int trackPositionFromList = VideoAppSingleton.INSTANCE.getPositionOfTrack();
         int nextPositionOfTrack = trackPositionFromList + 1;
         if (nextPositionOfTrack > 0) {
-            if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null) {
+            if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null && !VideoAppSingleton.INSTANCE.getImageFilesPathList().isEmpty()) {
                 VideoAppSingleton.INSTANCE.setPositionOfTrack(nextPositionOfTrack);
                 String imageFilePath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getImagePath();
                 String trackFilepath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getTrackPath();
-                String fileName = imageFilePath.substring( imageFilePath.lastIndexOf('/')+1);
+                String fileName = imageFilePath.substring(imageFilePath.lastIndexOf('/') + 1);
                 showImage(true, fileName, false, 0);
                 playTrackFromList(trackFilepath, false, 0);
             }
@@ -1090,7 +1092,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     }
 
     private synchronized void getMediaContent() {
-        PlayListManager playListManager = new PlayListManager();
+        PlayListManager playListManager = new PlayListManager(mContext);
         playListManager.getMediaContentFromSDCARD();
     }
 
