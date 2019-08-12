@@ -96,7 +96,11 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private List<ClientMessageHandler> messageHandlers = new ArrayList<>();
     private PowerManager.WakeLock wakeLock;
     private int volume = 50;   // 0-100
-    private int durationSecs;
+    private int duration;
+
+    private int getDurationSecs() {
+        return duration / 1000;
+    }
     public ViewPager albumsPager;
     public CarouselPagerAdapter adapter;
     private Context mContext;
@@ -398,9 +402,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             audioPlayer.setLooping(loop);
             audioPlayer.setDataSource(trackPath);
             audioPlayer.prepare();
-            durationSecs = audioPlayer.getDuration() / 1000;
-
-            Log.i(LOGTAG, "playTrack: start play music: startPosMillis: " + startPosMillis + ", durationSecs: " + durationSecs);
+            duration = audioPlayer.getDuration();
+            Log.i( LOGTAG, "playTrack: start play music: startPosMillis: "+ startPosMillis +", duration: "+ duration );
             audioPlayer.start();
             if (startPosMillis > 0)
                 audioPlayer.seekTo(startPosMillis);
@@ -433,9 +436,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             audioPlayer.setLooping(loop);
             audioPlayer.setDataSource(imagePath.getAbsolutePath());
             audioPlayer.prepare();
-            durationSecs = audioPlayer.getDuration() / 1000;
+            duration = audioPlayer.getDuration();
 
-            Log.i(LOGTAG, "playTrack: start play music: startPosMillis: " + startPosMillis + ", durationSecs: " + durationSecs);
+            Log.i(LOGTAG, "playTrack: start play music: startPosMillis: " + startPosMillis + ", durationSecs: " + duration);
             audioPlayer.start();
             if (startPosMillis > 0)
                 audioPlayer.seekTo(startPosMillis);
@@ -451,6 +454,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                int durationSecs = getDurationSecs();
                 if (durationSecs > 0) {
                     int mins = durationSecs / 60;
                     int secs = durationSecs - (mins * 60);
@@ -999,9 +1003,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         messageHandlers.add(new ClientMessageHandler("VidPlay_Volume") {
             @Override
             public void handleMessage(Message message) throws RemoteException {
+                int volumePercent = message.getParamInteger( "volumePercent" );
                 boolean volumeUp = message.getParamBoolean("volumeUp");
                 boolean volumeDown = message.getParamBoolean("volumeDown");
-                if (volumeUp) {
+                if ( volumePercent >= 0 ) {
+                    volume = volumePercent;
+                }
+                else if ( volumeUp ) {
                     volume = Math.min(volume + 5, 100);
                 } else if (volumeDown) {
                     volume = Math.max(volume - 5, 0);
