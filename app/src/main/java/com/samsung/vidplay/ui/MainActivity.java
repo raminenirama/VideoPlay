@@ -1100,7 +1100,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-    private synchronized void getMediaContent() {
+    private void getMediaContent() {
         PlayListManager playListManager = new PlayListManager(mContext);
         playListManager.getMediaContentFromSDCARD();
     }
