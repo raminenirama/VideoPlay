@@ -8,9 +8,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.MediaStore;
@@ -102,6 +102,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     private int getDurationSecs() {
         return duration / 1000;
     }
+
     public ViewPager albumsPager;
     public CarouselPagerAdapter adapter;
     private Context mContext;
@@ -230,8 +231,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             if (vidFound) {
                 initializeVideoPlayer();
             } else {
-                SetPlayListData setPlayListData = new SetPlayListData();
-                setPlayListData.execute();
+                setPlayListOnSeparateThread();
             }
         }
     }
@@ -403,7 +403,7 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             audioPlayer.setDataSource(trackPath);
             audioPlayer.prepare();
             duration = audioPlayer.getDuration();
-            Log.i( LOGTAG, "playTrack: start play music: startPosMillis: "+ startPosMillis +", duration: "+ duration );
+            Log.i(LOGTAG, "playTrack: start play music: startPosMillis: " + startPosMillis + ", duration: " + duration);
             audioPlayer.start();
             if (startPosMillis > 0)
                 audioPlayer.seekTo(startPosMillis);
@@ -574,14 +574,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             }
             Log.w(LOGTAG, "initializeVideoPlayer: videoPlayer: " + videoPlayer + ", videoFilename: " + videoFilename);
             setDataSource(videoFilename);
-
             prepare();
-
             videoPlayer.setLooping(loop);
             start();
-
-            SetPlayListData setPlayListData = new SetPlayListData();
-            setPlayListData.execute();
+            setPlayListOnSeparateThread();
         } else {
             Log.w(LOGTAG, "initializeVideoPlayer: Video not found, videoFilename: " + videoFilename);
         }
@@ -626,8 +622,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
             statusTimer.purge();
             statusTimer = null;
         }
+        unregisterHandlers();
         synchronized (this) {
-            unregisterHandlers();
             if (smeshProxy != null) {
                 smeshProxy.disconnect();
                 smeshProxy = null;
@@ -1006,13 +1002,12 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         messageHandlers.add(new ClientMessageHandler("VidPlay_Volume") {
             @Override
             public void handleMessage(Message message) throws RemoteException {
-                int volumePercent = message.getParamInteger( "volumePercent" );
+                int volumePercent = message.getParamInteger("volumePercent");
                 boolean volumeUp = message.getParamBoolean("volumeUp");
                 boolean volumeDown = message.getParamBoolean("volumeDown");
-                if ( volumePercent >= 0 ) {
+                if (volumePercent >= 0) {
                     volume = volumePercent;
-                }
-                else if ( volumeUp ) {
+                } else if (volumeUp) {
                     volume = Math.min(volume + 5, 100);
                 } else if (volumeDown) {
                     volume = Math.max(volume - 5, 0);
@@ -1100,9 +1095,10 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-    private void getMediaContent() {
+    private synchronized void getMediaContent() {
         PlayListManager playListManager = new PlayListManager(mContext);
         playListManager.getMediaContentFromSDCARD();
+        setPagerData(FIRST_PAGE);
     }
 
     private void unregisterHandlers() {
@@ -1119,17 +1115,13 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         adapter.notifyDataSetChanged();
     }
 
-    public class SetPlayListData extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            getMediaContent();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            setPagerData(FIRST_PAGE);
-        }
+    public void setPlayListOnSeparateThread() {
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                getMediaContent();
+            }
+        });
     }
 }
