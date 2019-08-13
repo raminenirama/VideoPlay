@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -114,16 +115,12 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
         mContext = MainActivity.this;
 
         checkForPermissions();
-        
+
         if (uncheckedPerms <= 0) {
             albumsPager = findViewById(R.id.albumspager);
             timeTotal = findViewById(R.id.timeTotal);
             timePast = findViewById(R.id.timePast);
             pastBar = findViewById(R.id.pastBar);
-
-            getMediaContent();
-            setPagerData(FIRST_PAGE);
-
             String defaultVideoName = "TheFrame.ts";
             String featureVideoName = null;
 
@@ -228,6 +225,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
             if (vidFound) {
                 initializeVideoPlayer();
+            } else {
+                SetPlayListData setPlayListData = new SetPlayListData();
+                setPlayListData.execute();
             }
         }
     }
@@ -575,6 +575,9 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
 
             videoPlayer.setLooping(loop);
             start();
+
+            SetPlayListData setPlayListData = new SetPlayListData();
+            setPlayListData.execute();
         } else {
             Log.w(LOGTAG, "initializeVideoPlayer: Video not found, videoFilename: " + videoFilename);
         }
@@ -1106,5 +1109,19 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
     public void getImagePosition(int imageFilePosition) {
         albumsPager.setCurrentItem(imageFilePosition);
         adapter.notifyDataSetChanged();
+    }
+
+    public class SetPlayListData extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            getMediaContent();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            setPagerData(FIRST_PAGE);
+        }
     }
 }
