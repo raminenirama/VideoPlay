@@ -1082,8 +1082,8 @@ public class MainActivity extends BaseActivity implements SurfaceHolder.Callback
      */
     private void getNextTrackFromList() {
         int trackPositionFromList = VideoAppSingleton.INSTANCE.getPositionOfTrack();
-        if (trackPositionFromList < VideoAppSingleton.INSTANCE.getTotalCountOfImage()) {
             int nextPositionOfTrack = trackPositionFromList + 1;
+        if (nextPositionOfTrack < VideoAppSingleton.INSTANCE.getTotalCountOfImage()) {
             if (VideoAppSingleton.INSTANCE.getImageFilesPathList() != null && !VideoAppSingleton.INSTANCE.getImageFilesPathList().isEmpty()) {
                 VideoAppSingleton.INSTANCE.setPositionOfTrack(nextPositionOfTrack);
                 String imageFilePath = Objects.requireNonNull(VideoAppSingleton.INSTANCE.getImageFilesPathList().get(nextPositionOfTrack)).getImagePath();
